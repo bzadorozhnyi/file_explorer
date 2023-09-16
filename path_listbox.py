@@ -113,7 +113,7 @@ class PathListbox(ttk.Treeview):
         else:
             handle_popup(self.file_menu)
 
-    def create_save_form(self, window_title: str, placeholder: str, handle_save_callback: Callable[[str]], event=None):
+    def create_save_form(self, window_title: str, placeholder: str, handle_save_callback: Callable[[str], None], event=None):
         """Creates a form to save file or folder."""
         window = tk.Toplevel(self)
         window.title(window_title)
