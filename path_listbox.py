@@ -78,34 +78,6 @@ class PathListbox(ttk.Treeview):
 
             self.update_file_list()
 
-    def rename(self, event=None):
-        if self.selection() != ():
-            item = self.selection()[0]
-            selected_path = self.item(item, "text")
-
-            window = tk.Toplevel(self)
-            window.title("Rename")
-
-            entry = ttk.Entry(window)
-            entry.insert(0, selected_path)
-            entry.pack()
-
-            def handle_save(event=None):
-                source = os.path.join(
-                    self.get_current_directory(), selected_path)
-                destionation = os.path.join(
-                    self.get_current_directory(), entry.get())
-
-                os.rename(source, destionation)
-
-                self.update_file_list()
-                window.destroy()
-
-            save_button = ttk.Button(window, text='Save', command=handle_save)
-            save_button.pack()
-
-            entry.bind("<Return>", handle_save)
-
     def copy_objects(self, event=None):
         self.copied_objects_paths = []
         current_directory = self.get_current_directory()
@@ -136,40 +108,71 @@ class PathListbox(ttk.Treeview):
         else:
             handle_popup(self.file_menu)
 
-    def create_save_form(self, window_title: str, placeholder: str, handle_save_callback: Callable[[str], None], event=None):
+    def create_save_form(self, window_title: str, placeholder: str, handle_save, event=None):
         """Creates a form to save file or folder."""
         window = tk.Toplevel(self)
         window.title(window_title)
 
         entry = ttk.Entry(window)
         entry.insert(0, placeholder)
-        entry.pack()
+        entry.pack(padx=5)
 
-        def handle_save(event=None):
+        save_button = ttk.Button(
+            window, text='Save', command=lambda: handle_save(entry.get(), window))
+        save_button.pack()
+
+        entry.bind("<Return>", lambda event: handle_save(entry.get(), window))
+
+    def create_file(self, event=None):
+        def handle_file_save(entry_value, window):
             absolute_path = os.path.join(
-                self.get_current_directory(), entry.get())
-            handle_save_callback(absolute_path)
+                self.get_current_directory(), entry_value)
+            open(absolute_path, 'x')
             self.update_file_list()
 
             window.destroy()
 
-        save_button = ttk.Button(window, text='Save', command=handle_save)
-        save_button.pack()
-
-        entry.bind("<Return>", handle_save)
-
-    def create_file(self, event=None):
         self.create_save_form("Create file", "New file",
-                              lambda path: open(path, 'x'), event)
+                              handle_file_save, event)
 
     def create_folder(self, event=None):
+        def handle_folder_save(entry_value, window):
+            absolute_path = os.path.join(
+                self.get_current_directory(), entry_value)
+            os.mkdir(absolute_path)
+            self.update_file_list()
+
+            window.destroy()
+
         self.create_save_form("Create folder", "New folder",
-                              lambda path: os.mkdir(path), event)
+                              handle_folder_save, event)
+
+    def rename(self, event=None):
+        if self.selection() == ():
+            return
+
+        item = self.selection()[0]
+        selected_path = self.item(item, "text")
+
+        def handle_rename(entry_value, window):
+            source = os.path.join(
+                self.get_current_directory(), selected_path)
+            destionation = os.path.join(
+                self.get_current_directory(), entry_value)
+
+            os.rename(source, destionation)
+
+            self.update_file_list()
+            window.destroy()
+
+        if self.selection() != ():
+            self.create_save_form("Rename", selected_path,
+                                  handle_rename, event)
 
     def update_file_list(self, event=None):  # Event parameter required, but not used
         """Updates current directory files list."""
         current_directory = self.get_current_directory()
-        
+
         # TODO implement opening file from search bar
         if os.path.isfile(current_directory):
             open_file(current_directory)
