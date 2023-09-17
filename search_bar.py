@@ -8,9 +8,9 @@ class SearchBar(tk.Frame):
         self.master = master
 
         self.path = tk.StringVar()
-        self.entry = ttk.Entry(textvariable=self.path)
+        self.entry = ttk.Entry(master=self, textvariable=self.path)
 
-        self.entry.pack(expand=True)
+        self.entry.pack(fill='x', padx=5, expand=True)
 
     def get_path(self):
         """Gets path printed in the search bar by the user."""

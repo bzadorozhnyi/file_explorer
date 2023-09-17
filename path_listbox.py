@@ -137,11 +137,11 @@ class PathListbox(ttk.Treeview):
 
     def create_file(self, event=None):
         self.create_save_form("Create file", "New file",
-                           lambda path: open(path, 'x'), event)
+                              lambda path: open(path, 'x'), event)
 
     def create_folder(self, event=None):
         self.create_save_form("Create folder", "New folder",
-                           lambda path: os.mkdir(path), event)
+                              lambda path: os.mkdir(path), event)
 
     def update_file_list(self, event=None):  # Event parameter required, but not used
         """Updates current directory files list."""

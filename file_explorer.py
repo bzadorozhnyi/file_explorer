@@ -13,13 +13,10 @@ class FileExplorer(tk.Tk):
         # Window setup
         self.title("File Explorer")
 
-        # Image setup
-        self._up_arrow = tk.PhotoImage(file='./images/up-arrow.png')
-
         # Setup navigation panel
         self.nav_panel = NavigationPanel(
-            master=self, parent_dir_img=self._up_arrow, open_parent_directory=self.open_parent_directory)
-        self.nav_panel.pack(side='top')
+            master=self, open_parent_directory=self.open_parent_directory)
+        self.nav_panel.pack(expand=True, fill='both', padx=5, pady=5)
 
         # Setup list box of files
         self.path_listbox = PathListbox(
