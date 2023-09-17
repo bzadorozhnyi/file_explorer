@@ -1,5 +1,6 @@
 import datetime
 import os
+import shutil
 import tkinter as tk
 from tkinter import messagebox, ttk
 from typing import Callable
@@ -29,11 +30,15 @@ class PathListbox(ttk.Treeview):
         self.__setup_command_menu()
         self.__setup_file_menu()
 
+        self.copied_objects_paths = []
+
         # BINDINGs
         self.bind("<Button-3>", self.do_popup)
         self.bind("<F2>", self.rename)
         self.bind("<Delete>", self.delete_items)
         self.bind("<Escape>", self.unselect)
+        self.bind("<Control-c>", self.copy_objects)
+        self.bind("<Control-v>", self.paste_objects)
 
     def __setup_command_menu(self):
         self.create_menu = tk.Menu(self, tearoff=0)
@@ -101,6 +106,24 @@ class PathListbox(ttk.Treeview):
 
             entry.bind("<Return>", handle_save)
 
+    def copy_objects(self, event=None):
+        self.copied_objects_paths = []
+        current_directory = self.get_current_directory()
+
+        for item in self.selection():
+            selected_path = self.item(item, "text")
+
+            self.copied_objects_paths.append(
+                os.path.join(current_directory, selected_path))
+
+    def paste_objects(self, event=None):
+        current_directory = self.get_current_directory()
+
+        for path in self.copied_objects_paths:
+            shutil.copy(path, current_directory)
+
+        self.update_file_list()
+
     def do_popup(self, event=None):
         def handle_popup(menu):
             try:
@@ -146,7 +169,8 @@ class PathListbox(ttk.Treeview):
     def update_file_list(self, event=None):  # Event parameter required, but not used
         """Updates current directory files list."""
         current_directory = self.get_current_directory()
-
+        
+        # TODO implement opening file from search bar
         if os.path.isfile(current_directory):
             open_file(current_directory)
         elif os.path.isdir(current_directory):

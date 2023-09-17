@@ -32,7 +32,10 @@ class FileExplorer(tk.Tk):
 
     def _get_current_directory(self) -> str:
         """Returns the directory that the user opened."""
-        return self.nav_panel.search_bar.get_path()
+        current_directory = self.nav_panel.search_bar.get_path()
+        if os.path.isfile(current_directory):
+            current_directory = get_parent_directory(current_directory)
+        return current_directory
 
     def open_dir_or_file(self, event=None):  # Event parameter required, but not used
         """Opens a file or directory depending on the path selected by the user."""
