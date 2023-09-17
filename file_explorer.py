@@ -3,7 +3,7 @@ import tkinter as tk
 
 from navigation_panel import NavigationPanel
 from path_listbox import PathListbox
-from utils import open_file
+from utils import get_parent_directory, open_file
 
 
 class FileExplorer(tk.Tk):
@@ -40,8 +40,14 @@ class FileExplorer(tk.Tk):
         item = self.path_listbox.selection()[0]
         selected_path = self.path_listbox.item(item, "text")
 
+        current_directory = self._get_current_directory()
+
+        # in the search bar is file path, get parent directory of it
+        if os.path.isfile(self._get_current_directory()):
+            current_directory = get_parent_directory(current_directory)
+
         absolute_path = os.path.join(
-            self._get_current_directory(), selected_path)
+            current_directory, selected_path)
 
         if os.path.isfile(absolute_path):
             open_file(absolute_path)
@@ -55,6 +61,6 @@ class FileExplorer(tk.Tk):
 
     def open_parent_directory(self):
         """Opens the parent directory of the current directory."""
-        parent_directory = os.path.dirname(self._get_current_directory())
+        parent_directory = get_parent_directory(self._get_current_directory())
 
         self.__change_directory(parent_directory)
