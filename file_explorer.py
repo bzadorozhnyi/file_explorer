@@ -31,8 +31,6 @@ class FileExplorer(tk.Tk):
         self.path_listbox.bind("<Double-1>", self.open_dir_or_file)
         self.path_listbox.bind("<Return>", self.open_dir_or_file)
         self.path_listbox.bind("<BackSpace>", self.open_parent_directory)
-        self.path_listbox.bind("<Down>", self.handle_down_button_click)
-        self.path_listbox.bind("<Up>", self.handle_up_button_click)
 
     def _get_current_directory(self) -> str:
         """Returns the directory that the user opened."""
@@ -72,24 +70,3 @@ class FileExplorer(tk.Tk):
         parent_directory = get_parent_directory(self._get_current_directory())
 
         self.__change_directory(parent_directory)
-
-    def handle_down_button_click(self, event=None):
-        children = self.path_listbox.get_children()
-        selection = self.path_listbox.selection()
-
-        if children:
-            if len(selection) == 0:
-                self.path_listbox.selection_set(children[0])
-            else:
-                next_index = children.index(selection[0]) + 1
-                if next_index < len(children):
-                    self.path_listbox.selection_set(children[next_index])
-
-    def handle_up_button_click(self, event=None):
-        children = self.path_listbox.get_children()
-        selection = self.path_listbox.selection()
-
-        if children and len(selection) == 1:
-            prev_index = children.index(selection[0]) - 1
-            if prev_index >= 0:
-                self.path_listbox.selection_set(children[prev_index])

@@ -39,6 +39,8 @@ class PathListbox(ttk.Treeview):
         self.bind("<Escape>", self.unselect)
         self.bind("<Control-c>", self.copy_objects)
         self.bind("<Control-v>", self.paste_objects)
+        self.bind("<Down>", self.handle_down_button_click)
+        self.bind("<Up>", self.handle_up_button_click)
 
     def __setup_command_menu(self):
         self.create_menu = tk.Menu(self, tearoff=0)
@@ -215,3 +217,24 @@ class PathListbox(ttk.Treeview):
             return datetime.datetime.fromtimestamp(modify_time).strftime("%d.%m.%Y %H:%M")
         except FileNotFoundError:
             return ""
+
+    def handle_down_button_click(self, event=None):
+        children = self.get_children()
+        selection = self.selection()
+
+        if children:
+            if len(selection) == 0:
+                self.selection_set(children[0])
+            else:
+                next_index = children.index(selection[0]) + 1
+                if next_index < len(children):
+                    self.selection_set(children[next_index])
+
+    def handle_up_button_click(self, event=None):
+        children = self.get_children()
+        selection = self.selection()
+
+        if children and len(selection) == 1:
+            prev_index = children.index(selection[0]) - 1
+            if prev_index >= 0:
+                self.selection_set(children[prev_index])
